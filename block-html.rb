@@ -175,7 +175,7 @@ class BlockHTML
 
     def initialize(html, indent)
       @html   = html 
-      @indent = indent
+      @indent = indent.to_i
       @count  = 0
       @text   = 0 < @indent
       @buf    = ''
