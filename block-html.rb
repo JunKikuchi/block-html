@@ -3,6 +3,7 @@ class BlockHTML
   include Enumerable
 
   attr_accessor :parent
+  attr_accessor :indent
 
   def initialize(params={}, &block)
     @parent = nil
