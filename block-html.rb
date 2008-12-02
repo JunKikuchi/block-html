@@ -77,11 +77,11 @@ class BlockHTML
     node
   end
 
-  def text(text)
+  def text(text='')
     self << Text.new(text)
   end
 
-  def escaped_text(text)
+  def escaped_text(text='')
     self << EscapedText.new(text)
   end
 
@@ -98,7 +98,9 @@ class BlockHTML
   class Attrs < ::Hash
     def to_s
       unless empty?
-        ' ' + sort.map do |key, val|
+        ' ' + sort do |a, b|
+          a.to_s <=> b.to_s
+        end.map do |key, val|
           '%s="%s"' % [key, val]
         end.join(' ')
       else
