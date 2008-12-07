@@ -79,10 +79,12 @@ class BlockHTML
 
   def text(text='')
     self << Text.new(text)
+    self
   end
 
   def escaped_text(text='')
     self << EscapedText.new(text)
+    self
   end
 
   def render(renderer)
