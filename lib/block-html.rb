@@ -1,25 +1,3 @@
-#
-# Copyright (c) 2008 Jun Kikuchi <kikuchi@bonnou.com>
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-
 class BlockHTML
   attr_accessor :parent
   attr_accessor :indent
@@ -29,6 +7,10 @@ class BlockHTML
     @nodes  = []
     @indent = params[:indent] || 2
     block.call(self) if block_given?
+    init
+  end
+
+  def init
   end
 
   def <<(tree)
@@ -206,7 +188,7 @@ class BlockHTML
     end
 
     def escape(text)
-      text.clone.to_s.gsub(/[#{ESC_STR}]/n) do |val|
+      text.to_s.gsub(/[#{ESC_STR}]/) do |val|
         ESC[val]
       end
     end
@@ -222,25 +204,25 @@ class BlockHTML
 
     def doctype(attrs)
       case attrs[:format]
-      when 'html5':
+      when 'html5'
         @buf << '<!DOCTYPE html>'
-      when 'html4':
+      when 'html4'
         case attrs[:type]
-        when 'strict':
+        when 'strict'
           @buf << '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">'
-        when 'frameset':
+        when 'frameset'
           @buf << '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">'
         else
           @buf << '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">'
         end
-      when 'xhtml':
+      when 'xhtml'
         if attrs[:version] == '1.1'
           @buf << '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
         else
           case attrs[:type]
-          when 'strict':
+          when 'strict'
             @buf << '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
-          when 'frameset':
+          when 'frameset'
             @buf << '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">'
           else
             @buf << '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
