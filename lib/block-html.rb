@@ -5,12 +5,8 @@ class BlockHTML
   def initialize(params={}, &block)
     @parent = nil
     @nodes  = []
-    @indent = params[:indent] || 2
+    @indent = params[:indent] || 0
     block.call(self) if block_given?
-    init
-  end
-
-  def init
   end
 
   def <<(tree)
