@@ -5,7 +5,7 @@ module Innate
     module BlockHTML
       def self.call(action, string)
         string = transform_string(action, string) if action.view
-        return string, 'text/html; charset=utf-8'
+        return string, 'text/html'
       end
 
       def self.transform_string(action, string)

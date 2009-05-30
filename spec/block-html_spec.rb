@@ -7,7 +7,7 @@ describe BlockHTML do
     end
 
     it 'インスタンス' do
-      %w'parent indent << path root each empty? xml doctype tag text escaped_text render to_s'.each do |val|
+      %w'parent << path root each empty? xml doctype tag text escaped_text render to_s'.each do |val|
         @bhtml.should respond_to val.to_sym
       end
     end
@@ -20,10 +20,6 @@ describe BlockHTML do
 
     it 'parent == nil' do
       @bhtml.parent.should be_nil
-    end
-
-    it 'indent == 0' do
-      @bhtml.indent.should be_zero
     end
 
     it 'path == []' do
@@ -156,6 +152,30 @@ describe BlockHTML do
 
     it '@bhtml.tag("p", :id => "abc").text("aaa")' do
       @bhtml.tag("p", :id => "abc").text("aaa").to_s.should == '<p id="abc">aaa</p>'
+    end
+
+    it '@bhtml.tag("p") { tag("br") }' do
+      @bhtml.tag("p") { tag('br') }.to_s.should == '<p><br /></p>'
+    end
+
+    it '@bhtml.tag("p") { tag("p").text(hello) }' do
+      hello = 'Hello'
+      @bhtml.tag("p") {
+        tag('p').text(hello)
+      }.to_s.should == '<p><p>Hello</p></p>'
+    end
+
+    describe 'インデントを設定' do
+      before do
+        @bhtml = BlockHTML.new
+      end
+
+      it '@bhtml.tag("div") { tag("p") { text("Hello") } }' do
+        @bhtml.tag("div") {
+          tag("p") { text("Hello") }
+        }
+        @bhtml.to_s(2).should == "<div>\n  <p>Hello</p>\n</div>"
+      end
     end
   end
 end

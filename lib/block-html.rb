@@ -1,12 +1,10 @@
 class BlockHTML
   attr_accessor :parent
-  attr_accessor :indent
 
-  def initialize(params={}, &block)
+  def initialize(&block)
     @parent = nil
     @nodes  = []
-    @indent = params[:indent] || 0
-    block.call(self) if block_given?
+    instance_eval(&block) if block_given?
   end
 
   def <<(tree)
@@ -51,7 +49,7 @@ class BlockHTML
 
   def tag(tag, attrs={}, &block)
     node = self << Tag.new(tag, attrs)
-    block.call(node) if block_given?
+    node.instance_eval(&block) if block_given?
     node
   end
 
@@ -71,8 +69,8 @@ class BlockHTML
     end
   end
 
-  def to_s
-    Renderer.new(self, @indent).to_s
+  def to_s(indent=0)
+    Renderer.new(self, indent).to_s
   end
 
   class Attrs < ::Hash
