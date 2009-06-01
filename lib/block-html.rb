@@ -1,9 +1,13 @@
 class BlockHTML
   attr_accessor :parent
 
-  def initialize(&block)
-    @parent = nil
-    @nodes  = []
+  def initialize(env_instance=nil, &block)
+    @parent, @nodes, @env_instance = nil, [], env_instance
+
+    @env_instance && @env_instance.instance_variables.each do |v|
+      self.instance_variable_set(v, @env_instance.instance_variable_get(v))
+    end
+
     instance_eval(&block) if block_given?
   end
 
@@ -48,9 +52,13 @@ class BlockHTML
   end
 
   def tag(tag, attrs={}, &block)
-    node = self << Tag.new(tag, attrs)
-    node.instance_eval(&block) if block_given?
-    node
+    self << Tag.new(tag, attrs, @env_instance, &block)
+  end
+
+  alias :_p :p
+
+  def p(attrs={}, &block)
+    tag('p', attrs, &block)
   end
 
   def text(text='')
@@ -67,6 +75,10 @@ class BlockHTML
     each do |node|
       node.render(renderer)
     end
+  end
+
+  def method_missing(tag, attrs={}, &block)
+    tag(tag, attrs, &block)
   end
 
   def to_s(indent=0)
@@ -119,13 +131,13 @@ class BlockHTML
   class Tag < BlockHTML
     attr_reader :attrs
 
-    def initialize(name, attrs={}, &block)
+    def initialize(name, attrs={}, env_instance=nil, &block)
       @name = name
       @attrs = attrs.inject(Attrs.new) do |ret, (key, val)|
         ret[key] = val
         ret
       end
-      super(&block)
+      super(env_instance, &block)
     end
 
     def [](key)
