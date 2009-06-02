@@ -1,4 +1,4 @@
-require 'lib/block-html'
+require 'lib/block_html'
 
 describe BlockHTML do
   describe 'インターフェース' do
