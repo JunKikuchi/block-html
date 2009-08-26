@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{block-html}
-  s.version = "0.0.0"
+  s.version = "0.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jun Kikuchi"]
-  s.date = %q{2009-08-25}
+  s.date = %q{2009-08-26}
   s.description = %q{block-html}
   s.email = %q{kikuchi@bonnou.com}
   s.extra_rdoc_files = [
@@ -21,10 +21,10 @@ Gem::Specification.new do |s|
      "README.rdoc",
      "Rakefile",
      "VERSION",
-     "lib/block_html.rb",
-     "lib/block_html/form.rb",
-     "spec/block_html/form_spec.rb",
-     "spec/block_html_spec.rb"
+     "lib/block-html.rb",
+     "lib/block-html/form.rb",
+     "spec/block-html/form_spec.rb",
+     "spec/block-html_spec.rb"
   ]
   s.homepage = %q{http://github.com/JunKikuchi/block-html}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -32,8 +32,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.5}
   s.summary = %q{block-html}
   s.test_files = [
-    "spec/block_html/form_spec.rb",
-     "spec/block_html_spec.rb"
+    "spec/block-html/form_spec.rb",
+     "spec/block-html_spec.rb"
   ]
 
   if s.respond_to? :specification_version then
