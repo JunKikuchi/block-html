@@ -71,6 +71,12 @@ class BlockHTML
     self
   end
 
+  def form(attrs={}, &block)
+    self << Form.new(@env_instance) {
+      form(attrs, &block)
+    }
+  end
+
   def render(renderer)
     each do |node|
       node.render(renderer)
