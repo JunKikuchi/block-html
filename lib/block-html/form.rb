@@ -1,114 +1,87 @@
 class BlockHTML
-  def self.normalize_model_name(model)
-    model.class.name.gsub(/::/, '_').downcase
-  end
-
-  def normalize_params(_name, params)
-    if @model.nil?
-      id   = params[:id] || _name
-      name = _name
-    else
-      model_name = self.class.normalize_model_name(@model)
-      id   = params[:id] || "#{model_name}_#{_name}"
-      name = "#{model_name}[#{_name}]"
+  class Form < BlockHTML
+    def tag(tag, attrs={}, &block)
+      self << Tag.new(nil, tag, attrs, @env_instance, &block)
     end
 
-    value   = @model[_name.to_sym] unless @model.nil?
-    value ||= params[:value] || params[:default] || nil
+    def form(attrs={}, &block)
+      tag(:form, attrs, &block)
+    end
 
-    label = params[:label] || _name
+    class Tag < BlockHTML::Tag
+      def initialize(model, name, attrs={}, env_instance=nil, &block)
+        @model = model
+        super(name, attrs, env_instance, &block)
+      end
 
-    errors   = @model.errors[_name.to_sym] unless @model.nil?
-    errors ||= params[:error] || []
+      def tag(tag, attrs={}, &block)
+        self << Tag.new(@model, tag, attrs, @env_instance, &block)
+      end
 
-    [id, name, value, label, errors]
-  end
-  private :normalize_params
+      def model(model, &block)
+        @model = model
+        block.call(self)
+        @model = nil
+      end
 
-  def error_tag(bhtml, errors)
-    bhtml.tag(:div, :class => :form_error_messages) do |div|
-      errors.each do |error|
-        div.tag(:p, :class => :form_error_message) do |_p|
-          _p.text error
+      def errors(name, params={})
+        return if @model.nil? || @model.errors[name].empty?
+
+        tag(:div, params) {
+          @model.errors.on(name).each do |val|
+            tag(:p).text(val)
+          end
+        }
+      end
+
+      def edit(name, params={})
+        self << Element::Input.new(@model, name, params, :text)
+      end
+
+      def password(name, params={})
+        self << Element::Input.new(@model, name, params, :password)
+      end
+
+      def submit(name, params={})
+        self << Element::Input.new(@model, name, params, :submit)
+      end
+
+      def checkbox(name, params={})
+        self << Element::Checkbox.new(@model, name, params)
+      end
+    end
+
+    class Element < BlockHTML
+      def initialize(model, name, params)
+        super()
+        @model, @name, @params = model, name, params
+        @id = @params[:id] || @name,
+        @value = @model ? @model.__send__(@name) : @params[:value]
+      end
+
+      class Input < Element
+        def initialize(model, name, params, type)
+          super(model, name, params)
+          tag :input,
+            :type  => type,
+            :id    => @id,
+            :name  => name,
+            :value => @value
         end
       end
-    end unless errors.empty?
-  end
-  private :error_tag
 
-  def form(attrs={}, &block)
-    tag :form, attrs do |form|
-      form.tag :dl, &block
-    end
-  end
-
-  def for(model, &block)
-    @model = model
-    block.call self
-    @model = nil
-  end
-
-  #
-  # params[:id]
-  # params[:value]
-  # params[:default]
-  # params[:label]
-  #
-  def edit(_name, params={})
-    id, name, value, label, errors = normalize_params(_name, params)
-
-    tag(:dt).tag(:label, :for => id).text label
-    tag(:dd) do |dd|
-      dd.tag :input,
-        :type  => :text,
-        :id    => id,
-        :name  => name,
-        :value => value
-      error_tag(dd, errors)
-    end
-  end
-
-  def password(_name, params={})
-    id, name, value, label, errors = normalize_params(_name, params)
-
-    tag(:dt).tag(:label, :for => id).text label
-    tag(:dd) do |dd|
-      dd.tag :input,
-        :type => :password,
-        :id   => id,
-        :name => name
-      error_tag(dd, errors)
-    end
-  end
-
-  def checkbox(_name, params={})
-    id, name, value, label, errors = normalize_params(_name, params)
-
-    attrs = {
-      :type => 'submit',
-      :id   => id,
-      :name => name
-    }
-    attrs[:checked] = '' if value
-
-    tag(:dt).tag(:label, :for => id).text label
-    tag(:dd) do |dd|
-      dd.tag :input, attrs
-      error_tag(dd, errors)
-    end
-  end
-
-  def submit(_name, params={})
-    id, name, value, label, errors = normalize_params(_name, params)
-
-    tag(:dt).text
-    tag(:dd) do |dd|
-      dd.tag :input,
-        :type  => :submit,
-        :id    => id,
-        :name  => name,
-        :value => label || name
-      error_tag(dd, errors)
+      class Checkbox < Element
+        def initialize(model, name, params)
+          super(model, name, params)
+          attrs = {
+            :type  => 'checkbox',
+            :id    => @id,
+            :name  => name
+          }
+          attrs[:checked] = '' if @value
+          tag :input, attrs
+        end
+      end
     end
   end
 end

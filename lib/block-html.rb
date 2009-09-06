@@ -140,14 +140,6 @@ class BlockHTML
       super(env_instance, &block)
     end
 
-    def [](key)
-      @attrs[key]
-    end
-
-    def []=(key, val)
-      @attrs[key] = val
-    end
-
     def render(renderer)
       renderer.tag(self, @name, @attrs)
     end
