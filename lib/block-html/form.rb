@@ -34,52 +34,71 @@ class BlockHTML
         }
       end
 
-      def edit(name, params={})
-        self << Element::Input.new(@model, name, params, :text)
+      def edit(name, attrs={})
+        self << Element::Input.new(
+          @model,
+          attrs.merge(:name => name, :type => :text)
+        )
       end
 
-      def password(name, params={})
-        self << Element::Input.new(@model, name, params, :password)
+      %w(file hidden).each do |type|
+        class_eval %Q{
+          def #{type}(name, attrs={})
+            self << Element::Input.new(
+              @model,
+              attrs.merge(:name => name, :type => :#{type})
+            )
+          end
+        }
       end
 
-      def submit(name, params={})
-        self << Element::Input.new(@model, name, params, :submit)
+      %w(submit reset button radio).each do |type|
+        class_eval %Q{
+          def #{type}(name, attrs={})
+            self << Element::Button.new(
+              @model,
+              attrs.merge(:name => name, :type => :#{type})
+            )
+          end
+        }
       end
 
-      def checkbox(name, params={})
-        self << Element::Checkbox.new(@model, name, params)
+      def checkbox(name, attrs={})
+        self << Element::Checkbox.new(
+          @model,
+          attrs.merge(:name => name, :type => :checkbox)
+        )
       end
     end
 
     class Element < BlockHTML
-      def initialize(model, name, params)
+      def initialize(model, attrs)
         super()
-        @model, @name, @params = model, name, params
-        @id = @params[:id] || @name,
-        @value = @model ? @model.__send__(@name) : @params[:value]
+        @model = model
+        @attrs = attrs
+        @name  = @attrs[:name]
+        @id    = @attrs[:id] || @name
+        @value = @model ? @model.__send__(@name) : @attrs[:value]
       end
 
       class Input < Element
-        def initialize(model, name, params, type)
-          super(model, name, params)
-          tag :input,
-            :type  => type,
-            :id    => @id,
-            :name  => name,
-            :value => @value
+        def initialize(model, attrs)
+          super(model, attrs)
+          tag(:input, @attrs.merge(:id => @id, :value => @value))
+        end
+      end
+
+      class Button < Element
+        def initialize(model, attrs)
+          super(model, attrs)
+          tag(:input, @attrs.merge(:id => @id, :value => @value || @name))
         end
       end
 
       class Checkbox < Element
-        def initialize(model, name, params)
-          super(model, name, params)
-          attrs = {
-            :type  => 'checkbox',
-            :id    => @id,
-            :name  => name
-          }
-          attrs[:checked] = '' if @value
-          tag :input, attrs
+        def initialize(model, attrs)
+          super(model, attrs)
+          tag(:input, @value ? @attrs.merge(:checked => '') : @attrs)
         end
       end
     end
