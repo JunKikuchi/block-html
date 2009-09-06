@@ -283,4 +283,6 @@ class BlockHTML
       @buf
     end
   end
+
+  autoload :Form, 'block-html/form'
 end
