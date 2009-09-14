@@ -41,6 +41,13 @@ class BlockHTML
         )
       end
 
+      def password(name, attrs={})
+        self << Element::Input.new(
+          @model,
+          attrs.merge(:name => name, :type => :password, :value => nil)
+        )
+      end
+
       %w(file hidden).each do |type|
         class_eval %Q{
           def #{type}(name, attrs={})
