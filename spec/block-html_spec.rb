@@ -143,7 +143,7 @@ describe BlockHTML do
 
   describe 'ノードを幾つか追加する操作' do
     before do
-      @bhtml = BlockHTML.new
+      @bhtml = BlockHTML.new(self)
     end
 
     it '@bhtml.tag("p").text("aaa")' do
@@ -162,6 +162,13 @@ describe BlockHTML do
       hello = 'Hello'
       @bhtml.tag("p") {
         tag('p').text(hello)
+      }.to_s.should == '<p><p>Hello</p></p>'
+    end
+
+    it '@bhtml.tag("p") { tag("p").text(@hello) }' do
+      @hello = 'Hello'
+      @bhtml.tag("p") {
+        tag('p').text(@hello)
       }.to_s.should == '<p><p>Hello</p></p>'
     end
 
