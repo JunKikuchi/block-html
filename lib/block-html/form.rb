@@ -42,9 +42,9 @@ class BlockHTML
       end
 
       def password(name, attrs={})
-        self << Element::Input.new(
+        self << Element::Password.new(
           @model,
-          attrs.merge(:name => name, :type => :password, :value => nil)
+          attrs.merge(:name => name, :type => :password)
         )
       end
 
@@ -92,6 +92,13 @@ class BlockHTML
         def initialize(model, attrs)
           super(model, attrs)
           tag(:input, @attrs.merge(:id => @id, :value => @value))
+        end
+      end
+
+      class Password < Element
+        def initialize(model, attrs)
+          super(model, attrs)
+          tag(:input, @attrs.merge(:id => @id, :value => ''))
         end
       end
 
